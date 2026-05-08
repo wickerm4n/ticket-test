@@ -1,111 +1,54 @@
-# Ticketverwaltung – GitHub Pages + Firebase
+# Ticketverwaltung
 
-Diese Version ist für dein Repository `ticket-test` vorbereitet und enthält bereits die fertige Firebase-Web-Konfiguration.
+Eine einfache Web-App zur Verwaltung von Event- und Menü-Tickets.
 
-## Ziel-URL
+Mit der Ticketverwaltung können Tickets schnell erstellt, bearbeitet, gesucht, ausgewählt, gelöscht und als CSV-Datei exportiert werden. Die App eignet sich für kleine Veranstaltungen, Bestellungen, Menüausgaben oder ähnliche Ticketlisten.
 
-```text
-https://wickerm4n.github.io/ticket-test/
-```
+## Funktionen
 
-## Enthaltene Dateien
+- Tickets mit Ticketnummer, Name, Telefonnummer, Tickettyp, Menü und Preis verwalten
+- Ticketliste durchsuchen und filtern
+- einzelne Tickets bearbeiten oder löschen
+- mehrere Tickets markieren und gesammelt löschen
+- ausgewählte Tickets als CSV-Datei exportieren
+- komplette Ticketliste als CSV-Datei exportieren
+- dezente Hinweisbenachrichtigungen nach Aktionen
+- optionale Bestätigungsdialoge mit „Nicht erneut anzeigen“
+- Share-Funktion zum Teilen einer Ticketliste
+- Read-only-Link für reine Ansicht
+- Edit-Link für gemeinsames Bearbeiten
+- automatische Synchronisierung geteilter Ticketlisten
 
-```text
-index.html
-404.html
-.nojekyll
-style.css
-app.js
-firebase-config.js
-firebase-rules.json
-icon.svg
-version.json
-README.md
-```
+## Nutzung
 
-## Bereits eingetragen
-
-In `firebase-config.js` ist bereits eingetragen:
-
-```text
-Projekt: ticketverwaltung-b5164
-Realtime Database: https://ticketverwaltung-b5164-default-rtdb.europe-west1.firebasedatabase.app
-GitHub-Pages-Basis: https://wickerm4n.github.io/ticket-test/
-```
-
-## Was du in Firebase noch machen musst
-
-### 1. Anonymous Authentication aktivieren
-
-Firebase Console:
-
-```text
-Authentication
-→ Sign-in method
-→ Anonymous
-→ Aktivieren
-→ Speichern
-```
-
-### 2. GitHub-Pages-Domain für Auth erlauben
-
-Firebase Console:
-
-```text
-Authentication
-→ Settings / Einstellungen
-→ Authorized domains / Autorisierte Domains
-→ Domain hinzufügen
-→ wickerm4n.github.io
-```
-
-### 3. Realtime-Database-Regeln einfügen
-
-Firebase Console:
-
-```text
-Realtime Database
-→ Rules / Regeln
-→ vorhandenen Inhalt komplett ersetzen
-→ Inhalt aus firebase-rules.json einfügen
-→ Veröffentlichen
-```
-
-Nicht dauerhaft offene Regeln wie `.read: true` / `.write: true` verwenden.
-
-## GitHub Pages hochladen
-
-Alle Dateien aus diesem ZIP direkt in den Root deines GitHub-Repositories `ticket-test` hochladen.
-
-GitHub:
-
-```text
-Repository ticket-test
-→ Settings
-→ Pages
-→ Deploy from branch
-→ Branch: main
-→ Folder: /root
-→ Save
-```
-
-Danach kurz warten und öffnen:
+Die App kann direkt im Browser geöffnet werden:
 
 ```text
 https://wickerm4n.github.io/ticket-test/
 ```
 
-## Share-Funktion testen
+Zum Erstellen eines Tickets die gewünschten Daten in das Formular eintragen und speichern. Bereits vorhandene Tickets erscheinen darunter in der Ticketliste.
 
-1. Seite öffnen.
-2. Falls nötig ein Ticket anlegen.
-3. Teilen-Icon im Header anklicken.
-4. Read-only-Link kopieren und in einem anderen Browser/Inkognito öffnen.
-5. Prüfen: Anzeigen und CSV-Export ja, Bearbeiten/Löschen/Speichern nein.
-6. Edit-Link kopieren und in einem anderen Browser/Inkognito öffnen.
-7. Prüfen: Tickets hinzufügen/bearbeiten/löschen wird in beiden Fenstern synchronisiert.
+Über die Checkboxen können mehrere Tickets gleichzeitig ausgewählt werden. Sobald mindestens ein Ticket markiert ist, stehen Aktionen wie Löschen oder CSV-Export für die Auswahl zur Verfügung.
 
-## Sicherheit
+## Ticketliste teilen
 
-Die Daten in `firebase-config.js` sind normale Firebase-Web-App-Konfiguration und kein Admin-Schlüssel.
-Nicht öffentlich hochladen darfst du dagegen Service-Account-Dateien, private Schlüssel oder Tokens.
+Über das Teilen-Symbol im Header kann ein Share-Link erstellt werden.
+
+Es gibt zwei Freigabearten:
+
+```text
+Read-only
+```
+
+Andere Personen können die Ticketliste ansehen, aber keine Tickets erstellen, bearbeiten oder löschen.
+
+```text
+Editierbar
+```
+
+Andere Personen können die geteilte Ticketliste gemeinsam bearbeiten. Änderungen werden bei verbundenen Nutzern automatisch aktualisiert.
+
+## Datenschutz-Hinweis
+
+Geteilte Ticketlisten sind über den jeweiligen Share-Link zugänglich. Der Link sollte daher nur an Personen weitergegeben werden, die die Ticketdaten sehen dürfen.
