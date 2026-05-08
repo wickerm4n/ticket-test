@@ -18,6 +18,7 @@ import { getDatabase, ref as dbRef, set as dbSet, update as dbUpdate, onValue } 
 
   const STORAGE_KEY = "eventTicketManagerData.v3";
   const REMOTE_SESSION_STORAGE_KEY = "eventTicketManagerRemote.v1";
+  const SHARED_STORAGE_PREFIX = "eventTicketManagerSharedData.v1:";
   const LEGACY_STORAGE_KEYS = ["eventTicketManagerData.v2", "eventTicketManagerData.v1"];
   const MAX_TICKETS = 250;
   const MAX_PRICE = 999_999_999;
@@ -1790,7 +1791,11 @@ import { getDatabase, ref as dbRef, set as dbSet, update as dbUpdate, onValue } 
       if (shareParams) {
         await joinSharedListFromUrl(shareParams);
       } else {
-        await restoreSharedListFromLocalSession();
+        // Ein normaler Aufruf der Basis-URL darf niemals automatisch wieder
+        // eine zuvor geöffnete Share-Liste laden. Geteilte Listen werden nur
+        // geöffnet, wenn der aktuelle Link echte Share-Parameter enthält.
+        clearRemoteSession();
+        updateAccessUi();
       }
     } catch (error) {
       console.error("Firebase-Initialisierung fehlgeschlagen:", error);
@@ -2026,7 +2031,7 @@ import { getDatabase, ref as dbRef, set as dbSet, update as dbUpdate, onValue } 
       state.remote.applyingRemote = true;
       try {
         applyPersistedData(snapshot.val());
-        saveLocalData();
+        saveSharedData(listId);
         clearSelectedTickets();
         if (state.editingId && !state.tickets.some((ticket) => ticket.id === state.editingId)) {
           clearForm();
@@ -2255,8 +2260,11 @@ import { getDatabase, ref as dbRef, set as dbSet, update as dbUpdate, onValue } 
 
   function saveData() {
     const data = createPersistedData();
+    const saved = state.remote.listId
+      ? saveSharedData(state.remote.listId, data)
+      : saveLocalData(data);
 
-    if (!saveLocalData(data)) {
+    if (!saved) {
       showToast("Speichern fehlgeschlagen.", "danger");
       return false;
     }
@@ -2279,6 +2287,12 @@ import { getDatabase, ref as dbRef, set as dbSet, update as dbUpdate, onValue } 
 
   function saveLocalData(data = createPersistedData()) {
     return safeStorageSet(localStorage, STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function saveSharedData(listId, data = createPersistedData()) {
+    const safeListId = sanitizeShareToken(listId, 128);
+    if (!safeListId) return false;
+    return safeStorageSet(localStorage, `${SHARED_STORAGE_PREFIX}${safeListId}`, JSON.stringify(data));
   }
 
   function loadData() {
