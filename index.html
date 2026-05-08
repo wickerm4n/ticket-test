@@ -1,0 +1,1846 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Event Ticket Manager</title>
+  <style>
+:root {
+  --bg: #111418;
+  --panel: #1a1f26;
+  --panel-2: #20262f;
+  --panel-3: #252c36;
+  --border: #333c49;
+  --border-soft: rgba(255,255,255,.08);
+  --text: #f2f4f7;
+  --muted: #aeb7c4;
+  --muted-2: #7f8a99;
+  --accent: #5da9ff;
+  --accent-strong: #3187e6;
+  --danger: #ff6b6b;
+  --danger-strong: #e84f4f;
+  --success: #57d68d;
+  --shadow: 0 18px 46px rgba(0,0,0,.32);
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --focus: 0 0 0 3px rgba(93,169,255,.22);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: radial-gradient(circle at top left, rgba(93,169,255,.14), transparent 34rem), var(--bg);
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  color: var(--text);
+  background: transparent;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: block;
+  fill: currentColor;
+}
+
+.app-shell {
+  width: min(1480px, calc(100% - 32px));
+  margin: 24px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.app-header,
+.panel,
+.app-footer {
+  border: 1px solid var(--border-soft);
+  background: linear-gradient(145deg, rgba(31,37,46,.94), rgba(22,26,32,.94));
+  box-shadow: var(--shadow);
+}
+
+.app-header {
+  min-height: 82px;
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.brand-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.brand-icon {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: var(--accent);
+  background: linear-gradient(145deg, rgba(93,169,255,.18), rgba(255,255,255,.05));
+  border: 1px solid rgba(93,169,255,.2);
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(1.12rem, 2vw, 1.45rem);
+  letter-spacing: -.02em;
+}
+
+h2 {
+  font-size: 1rem;
+  letter-spacing: -.01em;
+}
+
+.subline,
+.small-muted,
+.app-footer {
+  color: var(--muted);
+}
+
+.subline {
+  margin-top: 4px;
+  font-size: .92rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-actions,
+.bulk-actions,
+.form-actions,
+.dialog-actions,
+.inline-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-button {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  color: var(--text);
+  background: linear-gradient(145deg, #2b333e, #1c222a);
+  border: 1px solid var(--border-soft);
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease, opacity .18s ease;
+}
+
+.icon-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(93,169,255,.38);
+  color: var(--accent);
+  background: linear-gradient(145deg, #303946, #202833);
+}
+
+.icon-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.icon-button:disabled,
+.primary-button:disabled,
+.secondary-button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.icon-button.danger:hover:not(:disabled) {
+  color: var(--danger);
+  border-color: rgba(255,107,107,.45);
+}
+
+.icon-button.danger-neutral:hover:not(:disabled) {
+  color: var(--success);
+  border-color: rgba(87,214,141,.38);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 410px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.panel {
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  min-width: 0;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.table-heading {
+  align-items: center;
+}
+
+.small-muted {
+  margin-top: 4px;
+  font-size: .86rem;
+}
+
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+  color: #d9edff;
+  background: rgba(93,169,255,.15);
+  border: 1px solid rgba(93,169,255,.25);
+  white-space: nowrap;
+}
+
+.mode-badge.readonly {
+  color: #ffdede;
+  background: rgba(255,107,107,.13);
+  border-color: rgba(255,107,107,.28);
+}
+
+.ticket-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ticket-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: .88rem;
+}
+
+.ticket-form label:first-of-type,
+.ticket-form label:nth-of-type(4),
+.form-actions {
+  grid-column: 1 / -1;
+}
+
+input,
+select {
+  width: 100%;
+  height: 42px;
+  color: var(--text);
+  background: #12171d;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 0 12px;
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+input::placeholder {
+  color: #697484;
+}
+
+input:disabled,
+select:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  background: #171b21;
+}
+
+select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%),
+    linear-gradient(to right, rgba(255,255,255,.08), rgba(255,255,255,.08));
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 13px) calc(50% - 3px),
+    calc(100% - 38px) 50%;
+  background-size: 5px 5px, 5px 5px, 1px 58%;
+  background-repeat: no-repeat;
+  padding-right: 48px;
+}
+
+.primary-button,
+.secondary-button {
+  min-height: 42px;
+  border-radius: 14px;
+  padding: 0 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, opacity .18s ease;
+}
+
+.primary-button {
+  color: #fff;
+  background: linear-gradient(145deg, var(--accent), var(--accent-strong));
+}
+
+.primary-button:hover:not(:disabled),
+.secondary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.secondary-button {
+  color: var(--text);
+  background: linear-gradient(145deg, #2a323d, #202731);
+  border: 1px solid var(--border-soft);
+}
+
+.table-panel {
+  overflow: hidden;
+}
+
+.table-shell {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--border-soft);
+  background: rgba(12,15,19,.38);
+}
+
+.ticket-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: .9rem;
+}
+
+.ticket-table th,
+.ticket-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  text-align: center;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.ticket-table th {
+  color: #dce5ef;
+  font-weight: 800;
+  background: rgba(255,255,255,.04);
+}
+
+.ticket-table tbody tr {
+  transition: background .18s ease;
+}
+
+.ticket-table tbody tr:hover {
+  background: rgba(93,169,255,.06);
+}
+
+.ticket-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.ticket-table .check-col {
+  width: 44px;
+}
+
+.ticket-table th:last-child,
+.ticket-table td:last-child {
+  width: 98px;
+}
+
+.ticket-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  padding: 0;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.row-actions .icon-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+}
+
+.row-actions svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.empty-cell {
+  color: var(--muted-2);
+  padding: 28px !important;
+}
+
+.app-footer {
+  border-radius: 18px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: .86rem;
+}
+
+.link-button {
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link-button:hover {
+  color: var(--accent);
+}
+
+.toast-root {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  z-index: 60;
+  display: grid;
+  gap: 10px;
+  width: min(390px, calc(100vw - 28px));
+  pointer-events: none;
+}
+
+.toast {
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.13);
+  background: linear-gradient(145deg, rgba(35,42,52,.98), rgba(24,29,36,.98));
+  box-shadow: 0 18px 48px rgba(0,0,0,.38);
+  padding: 14px 15px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(-14px) scale(.985);
+  animation: toast-in .24s ease forwards;
+}
+
+.toast::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(93,169,255,.12);
+}
+
+.toast.success::before { background: var(--success); box-shadow: 0 0 0 4px rgba(87,214,141,.12); }
+.toast.error::before { background: var(--danger); box-shadow: 0 0 0 4px rgba(255,107,107,.12); }
+
+.toast.hide {
+  animation: toast-out .2s ease forwards;
+}
+
+.toast strong {
+  display: block;
+  font-size: .95rem;
+  margin-bottom: 2px;
+}
+
+.toast span {
+  color: var(--muted);
+  font-size: .88rem;
+}
+
+@keyframes toast-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(-12px) scale(.985); }
+}
+
+.modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+}
+
+.modal-card {
+  width: min(520px, 100%);
+  border-radius: 24px;
+  border: 1px solid var(--border-soft);
+  background: linear-gradient(145deg, #222933, #171c23);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.modal-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.08rem;
+}
+
+.modal-card p {
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: .92rem;
+}
+
+.share-options {
+  margin: 16px 0;
+  display: grid;
+  gap: 10px;
+}
+
+.share-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border-soft);
+  background: rgba(255,255,255,.04);
+  cursor: pointer;
+}
+
+.share-option input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.share-option strong,
+.confirm-check strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.share-option span,
+.confirm-check span {
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.4;
+}
+
+.share-link-box {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.share-link-box input {
+  font-size: .84rem;
+}
+
+.confirm-check {
+  margin: 14px 0 4px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  color: var(--text);
+}
+
+.confirm-check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.dialog-actions {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+@media (max-width: 1120px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-table {
+    min-width: 0;
+    font-size: .84rem;
+  }
+
+  .ticket-table th,
+  .ticket-table td {
+    padding: 10px 7px;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    width: min(100% - 18px, 1480px);
+    margin: 9px auto;
+  }
+
+  .app-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    justify-content: flex-end;
+  }
+
+  .ticket-form {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-form label,
+  .ticket-form label:first-of-type,
+  .ticket-form label:nth-of-type(4),
+  .form-actions {
+    grid-column: 1;
+  }
+
+  .ticket-table,
+  .ticket-table thead,
+  .ticket-table tbody,
+  .ticket-table tr,
+  .ticket-table th,
+  .ticket-table td {
+    display: block;
+  }
+
+  .ticket-table thead {
+    display: none;
+  }
+
+  .ticket-table tbody {
+    padding: 10px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .ticket-table tbody tr {
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    background: rgba(255,255,255,.035);
+    padding: 10px;
+  }
+
+  .ticket-table td {
+    width: 100% !important;
+    border: 0;
+    padding: 7px 4px;
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    text-align: left;
+    gap: 10px;
+  }
+
+  .ticket-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .ticket-table td.check-col {
+    grid-template-columns: auto 1fr;
+  }
+
+  .ticket-table td.check-col::before {
+    content: "Auswahl";
+  }
+
+  .row-actions {
+    justify-content: flex-start;
+  }
+
+  .empty-cell {
+    display: block !important;
+    text-align: center !important;
+  }
+
+  .empty-cell::before {
+    content: "" !important;
+  }
+
+  .toast-root {
+    top: 12px;
+    right: 14px;
+  }
+}
+
+
+.share-option.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.share-option.is-disabled * {
+  cursor: not-allowed;
+}
+
+  </style>
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="app-header">
+      <div class="brand-area">
+        <div class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 4.75A2.75 2.75 0 0 1 7.75 2h8.5A2.75 2.75 0 0 1 19 4.75v14.5A2.75 2.75 0 0 1 16.25 22h-8.5A2.75 2.75 0 0 1 5 19.25V4.75Zm2.75-1.1c-.6 0-1.1.5-1.1 1.1v14.5c0 .6.5 1.1 1.1 1.1h8.5c.6 0 1.1-.5 1.1-1.1V4.75c0-.6-.5-1.1-1.1-1.1h-8.5ZM8.7 7.5c0-.46.37-.82.82-.82h4.96a.82.82 0 1 1 0 1.64H9.52a.82.82 0 0 1-.82-.82Zm0 4.5c0-.46.37-.82.82-.82h4.96a.82.82 0 1 1 0 1.64H9.52A.82.82 0 0 1 8.7 12Zm0 4.5c0-.46.37-.82.82-.82h2.66a.82.82 0 1 1 0 1.64H9.52a.82.82 0 0 1-.82-.82Z"/></svg>
+        </div>
+        <div>
+          <h1>Event Ticket Manager</h1>
+          <p id="connectionStatus" class="subline">Lokale Ticketliste</p>
+        </div>
+      </div>
+
+      <div class="header-actions" aria-label="Header-Aktionen">
+        <button id="shareButton" class="icon-button" type="button" title="Ticketliste teilen" aria-label="Ticketliste teilen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11A2.99 2.99 0 1 0 15 5c0 .24.04.47.09.7L8.04 9.81A3 3 0 1 0 8.04 14.2l7.12 4.18c-.05.2-.08.41-.08.63a2.92 2.92 0 1 0 2.92-2.92Z"/></svg>
+        </button>
+        <button id="exportAllButton" class="icon-button" type="button" title="Alle Tickets als CSV exportieren" aria-label="Alle Tickets als CSV exportieren">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.42l2.3 2.3V4a1 1 0 0 1 1-1ZM5 17a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v1.25A1.75 1.75 0 0 1 18.25 21H5.75A1.75 1.75 0 0 1 4 19.25V18a1 1 0 0 1 1-1Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="content-grid">
+      <section class="panel form-panel" aria-labelledby="formTitle">
+        <div class="section-heading">
+          <h2 id="formTitle">Ticket erfassen</h2>
+          <span id="modeBadge" class="mode-badge">Bearbeitbar</span>
+        </div>
+
+        <form id="ticketForm" class="ticket-form" autocomplete="off">
+          <input id="editingId" type="hidden">
+
+          <label>
+            <span>Ticketnummer</span>
+            <input id="ticketNumber" name="ticketNumber" type="text" required placeholder="z. B. A-001">
+          </label>
+
+          <label>
+            <span>Vorname</span>
+            <input id="firstName" name="firstName" type="text" required placeholder="Vorname">
+          </label>
+
+          <label>
+            <span>Nachname</span>
+            <input id="lastName" name="lastName" type="text" required placeholder="Nachname">
+          </label>
+
+          <label>
+            <span>Telefonnummer</span>
+            <input id="phone" name="phone" type="tel" placeholder="Optional">
+          </label>
+
+          <label>
+            <span>Tickettyp</span>
+            <select id="ticketType" name="ticketType">
+              <option value="Standard">Standard</option>
+              <option value="VIP">VIP</option>
+              <option value="Supporter">Supporter</option>
+              <option value="Gast">Gast</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Preis</span>
+            <input id="price" name="price" type="number" min="0" step="0.01" placeholder="0,00">
+          </label>
+
+          <label>
+            <span>Menü</span>
+            <select id="menu" name="menu">
+              <option value="">Kein Menü</option>
+              <option value="Menü 1">Menü 1</option>
+              <option value="Menü 2 (Veggie)">Menü 2 (Veggie)</option>
+            </select>
+          </label>
+
+          <div class="form-actions">
+            <button id="submitButton" class="primary-button" type="submit">Ticket speichern</button>
+            <button id="cancelEditButton" class="secondary-button" type="button" hidden>Bearbeitung abbrechen</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel table-panel" aria-labelledby="tableTitle">
+        <div class="section-heading table-heading">
+          <div>
+            <h2 id="tableTitle">Ticketliste</h2>
+            <p id="tableInfo" class="small-muted">0 Tickets</p>
+          </div>
+
+          <div id="bulkActions" class="bulk-actions" hidden>
+            <span id="selectedCount" class="small-muted">0 ausgewählt</span>
+            <button id="exportSelectedButton" class="icon-button danger-neutral" type="button" title="Ausgewählte Tickets als CSV-Datei exportieren" aria-label="Ausgewählte Tickets als CSV-Datei exportieren">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v8.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.42l2.3 2.3V4a1 1 0 0 1 1-1ZM5 17a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v1.25A1.75 1.75 0 0 1 18.25 21H5.75A1.75 1.75 0 0 1 4 19.25V18a1 1 0 0 1 1-1Z"/></svg>
+            </button>
+            <button id="deleteSelectedButton" class="icon-button danger" type="button" title="Ausgewählte Tickets löschen" aria-label="Ausgewählte Tickets löschen">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V4h4a1 1 0 1 1 0 2h-.62l-.83 13.1A3.1 3.1 0 0 1 14.46 22H9.54a3.1 3.1 0 0 1-3.09-2.9L5.62 6H5a1 1 0 0 1 0-2h4v-.5ZM10.5 4h3v-.5h-3V4ZM7.63 6l.82 12.98c.04.57.51 1.02 1.09 1.02h4.92c.58 0 1.05-.45 1.09-1.02L16.37 6H7.63ZM10 9a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Zm4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-shell">
+          <table class="ticket-table">
+            <thead>
+              <tr>
+                <th class="check-col"><input id="selectAll" type="checkbox" aria-label="Alle Tickets auswählen"></th>
+                <th>Ticketnummer</th>
+                <th>Vorname</th>
+                <th>Nachname</th>
+                <th>Telefonnummer</th>
+                <th>Tickettyp</th>
+                <th>Preis</th>
+                <th>Menü</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody id="ticketTableBody">
+              <tr><td colspan="9" class="empty-cell">Noch keine Tickets vorhanden.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <button id="resetConfirmationsButton" class="link-button" type="button">Bestätigungsdialoge zurücksetzen</button>
+      <span id="versionInfo">Version: lokal</span>
+    </footer>
+  </div>
+
+  <div id="toastRoot" class="toast-root" aria-live="polite" aria-atomic="true"></div>
+  <div id="modalRoot" class="modal-root" hidden></div>
+
+  <script>
+window.TICKET_MANAGER_CONFIG = {
+  BASE_URL: "https://wickerm4n.github.io/ticket-test/",
+  API_BASE_URL: "",
+  SOCKET_BASE_URL: ""
+};
+  </script>
+  <script>
+(() => {
+  // assets/js/utils.js
+  function uid(prefix = "id") {
+    const bytes = new Uint8Array(12);
+    crypto.getRandomValues(bytes);
+    const value = Array.from(bytes, (b) => b.toString(36).padStart(2, "0")).join("");
+    return `${prefix}_${value}`;
+  }
+  function escapeHtml(value) {
+    return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+  function normalizeTicket(input = {}) {
+    const now = (/* @__PURE__ */ new Date()).toISOString();
+    const price = String(input.price ?? "").replace(",", ".").trim();
+    const priceNumber = Number(price);
+    return {
+      id: String(input.id || uid("ticket")),
+      ticketNumber: String(input.ticketNumber ?? "").trim(),
+      firstName: String(input.firstName ?? "").trim(),
+      lastName: String(input.lastName ?? "").trim(),
+      phone: String(input.phone ?? "").trim(),
+      ticketType: String(input.ticketType ?? "Standard").trim() || "Standard",
+      price: price && Number.isFinite(priceNumber) && priceNumber >= 0 ? priceNumber.toFixed(2) : "",
+      menu: String(input.menu ?? "").trim(),
+      createdAt: input.createdAt || now,
+      updatedAt: input.updatedAt || now
+    };
+  }
+  function validateTicket(ticket, tickets = [], editingId = "") {
+    if (!ticket.ticketNumber) return "Ticketnummer fehlt.";
+    if (!ticket.firstName) return "Vorname fehlt.";
+    if (!ticket.lastName) return "Nachname fehlt.";
+    const duplicate = tickets.some((item) => item.id !== editingId && item.ticketNumber.toLowerCase() === ticket.ticketNumber.toLowerCase());
+    if (duplicate) return "Diese Ticketnummer existiert bereits.";
+    return "";
+  }
+  function formatPrice(value) {
+    if (value === "" || value === null || value === void 0) return "";
+    const numberValue = Number(String(value).replace(",", "."));
+    if (!Number.isFinite(numberValue)) return String(value);
+    return numberValue.toLocaleString("de-DE", { style: "currency", currency: "EUR" });
+  }
+  function toCsvValue(value) {
+    const text = String(value ?? "");
+    if (/[";\n\r]/.test(text)) return `"${text.replaceAll('"', '""')}"`;
+    return text;
+  }
+  function downloadCsv(filename, tickets) {
+    const header = ["Ticketnummer", "Vorname", "Nachname", "Telefonnummer", "Tickettyp", "Preis", "Men\xFC"];
+    const rows = tickets.map((ticket) => [
+      ticket.ticketNumber,
+      ticket.firstName,
+      ticket.lastName,
+      ticket.phone,
+      ticket.ticketType,
+      ticket.price,
+      ticket.menu
+    ]);
+    const csv = [header, ...rows].map((row) => row.map(toCsvValue).join(";")).join("\r\n");
+    const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+  async function copyToClipboard(text) {
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const input = document.createElement("textarea");
+    input.value = text;
+    input.setAttribute("readonly", "");
+    input.style.position = "fixed";
+    input.style.left = "-9999px";
+    document.body.append(input);
+    input.select();
+    document.execCommand("copy");
+    input.remove();
+  }
+  function stableHash(value) {
+    return JSON.stringify(value, Object.keys(flattenForKeys(value)).sort());
+  }
+  function flattenForKeys(value, result = {}) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => flattenForKeys(item, result));
+    } else if (value && typeof value === "object") {
+      Object.keys(value).forEach((key) => {
+        result[key] = true;
+        flattenForKeys(value[key], result);
+      });
+    }
+    return result;
+  }
+
+  // assets/js/state.js
+  var state = {
+    clientId: uid("client"),
+    tickets: [],
+    selectedIds: /* @__PURE__ */ new Set(),
+    version: 1,
+    updatedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    mode: "local",
+    access: "edit",
+    listId: "",
+    token: "",
+    socket: null,
+    lastTicketsHash: "",
+    listeners: /* @__PURE__ */ new Set()
+  };
+  function subscribe(listener) {
+    state.listeners.add(listener);
+    return () => state.listeners.delete(listener);
+  }
+  function notify() {
+    for (const listener of state.listeners) listener(state);
+  }
+  function isSharedMode() {
+    return state.mode === "shared";
+  }
+  function canEdit() {
+    return state.access === "edit";
+  }
+  function applyTickets(tickets, meta = {}) {
+    const nextHash = stableHash(tickets);
+    const sameTickets = nextHash === state.lastTicketsHash;
+    state.tickets = tickets;
+    state.version = Number(meta.version || state.version || 1);
+    state.updatedAt = meta.updatedAt || state.updatedAt;
+    if (meta.mode) state.mode = meta.mode;
+    if (meta.access) state.access = meta.access;
+    if (meta.listId) state.listId = meta.listId;
+    if (meta.token) state.token = meta.token;
+    state.lastTicketsHash = nextHash;
+    const existingIds = new Set(tickets.map((ticket) => ticket.id));
+    state.selectedIds = new Set([...state.selectedIds].filter((id) => existingIds.has(id)));
+    if (!sameTickets || meta.force) notify();
+  }
+  function setSelection(id, checked) {
+    if (checked) state.selectedIds.add(id);
+    else state.selectedIds.delete(id);
+    notify();
+  }
+  function setAllSelection(checked) {
+    state.selectedIds = checked ? new Set(state.tickets.map((ticket) => ticket.id)) : /* @__PURE__ */ new Set();
+    notify();
+  }
+  function clearSelection() {
+    if (!state.selectedIds.size) return;
+    state.selectedIds.clear();
+    notify();
+  }
+
+  // assets/js/ui.js
+  var els = {
+    connectionStatus: document.getElementById("connectionStatus"),
+    modeBadge: document.getElementById("modeBadge"),
+    versionInfo: document.getElementById("versionInfo"),
+    ticketForm: document.getElementById("ticketForm"),
+    editingId: document.getElementById("editingId"),
+    ticketNumber: document.getElementById("ticketNumber"),
+    firstName: document.getElementById("firstName"),
+    lastName: document.getElementById("lastName"),
+    phone: document.getElementById("phone"),
+    ticketType: document.getElementById("ticketType"),
+    price: document.getElementById("price"),
+    menu: document.getElementById("menu"),
+    submitButton: document.getElementById("submitButton"),
+    cancelEditButton: document.getElementById("cancelEditButton"),
+    tableInfo: document.getElementById("tableInfo"),
+    ticketTableBody: document.getElementById("ticketTableBody"),
+    selectAll: document.getElementById("selectAll"),
+    bulkActions: document.getElementById("bulkActions"),
+    selectedCount: document.getElementById("selectedCount"),
+    exportSelectedButton: document.getElementById("exportSelectedButton"),
+    deleteSelectedButton: document.getElementById("deleteSelectedButton"),
+    shareButton: document.getElementById("shareButton"),
+    exportAllButton: document.getElementById("exportAllButton"),
+    resetConfirmationsButton: document.getElementById("resetConfirmationsButton")
+  };
+  function render() {
+    renderMode();
+    renderTickets();
+    renderSelection();
+    applyPermissionState();
+  }
+  function renderMode() {
+    const shared = state.mode === "shared";
+    const snapshot = state.mode === "snapshot";
+    const accessLabel = state.access === "edit" ? "Editierbar" : "Read-only";
+    els.connectionStatus.textContent = shared ? `Geteilte Ticketliste \xB7 ${accessLabel}` : snapshot ? "Geteilter Read-only-Snapshot" : "Lokale Ticketliste";
+    els.modeBadge.textContent = snapshot ? "Snapshot" : accessLabel;
+    els.modeBadge.classList.toggle("readonly", state.access !== "edit");
+    els.versionInfo.textContent = shared ? `Share-ID: ${state.listId} \xB7 Version: ${state.version}` : snapshot ? `Statischer Snapshot \xB7 Version: ${state.version}` : `Version: lokal ${state.version}`;
+  }
+  function renderTickets() {
+    const tickets = state.tickets;
+    els.tableInfo.textContent = `${tickets.length} ${tickets.length === 1 ? "Ticket" : "Tickets"}`;
+    if (!tickets.length) {
+      els.ticketTableBody.innerHTML = `<tr><td colspan="9" class="empty-cell">Noch keine Tickets vorhanden.</td></tr>`;
+      return;
+    }
+    els.ticketTableBody.innerHTML = tickets.map((ticket) => `
+    <tr data-id="${escapeHtml(ticket.id)}">
+      <td class="check-col" data-label="Auswahl">
+        <input class="row-select" type="checkbox" aria-label="Ticket ${escapeHtml(ticket.ticketNumber)} ausw\xE4hlen" ${state.selectedIds.has(ticket.id) ? "checked" : ""}>
+      </td>
+      <td data-label="Ticketnummer">${escapeHtml(ticket.ticketNumber)}</td>
+      <td data-label="Vorname">${escapeHtml(ticket.firstName)}</td>
+      <td data-label="Nachname">${escapeHtml(ticket.lastName)}</td>
+      <td data-label="Telefonnummer">${escapeHtml(ticket.phone || "\u2014")}</td>
+      <td data-label="Tickettyp">${escapeHtml(ticket.ticketType || "\u2014")}</td>
+      <td data-label="Preis">${escapeHtml(formatPrice(ticket.price) || "\u2014")}</td>
+      <td data-label="Men\xFC">${escapeHtml(ticket.menu || "\u2014")}</td>
+      <td data-label="Aktionen">
+        <div class="row-actions">
+          ${canEdit() ? `
+            <button class="icon-button edit-ticket" type="button" title="Ticket bearbeiten" aria-label="Ticket bearbeiten">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.86 3.49a1.7 1.7 0 0 1 2.4 0l1.25 1.25a1.7 1.7 0 0 1 0 2.4L8.85 18.8 4 20l1.2-4.85L16.86 3.49Zm1.34 1.4L6.97 16.12l-.45 1.82 1.82-.45L19.57 6.26 18.2 4.9Z"/></svg>
+            </button>
+            <button class="icon-button danger delete-ticket" type="button" title="Ticket l\xF6schen" aria-label="Ticket l\xF6schen">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V4h4a1 1 0 1 1 0 2h-.62l-.83 13.1A3.1 3.1 0 0 1 14.46 22H9.54a3.1 3.1 0 0 1-3.09-2.9L5.62 6H5a1 1 0 0 1 0-2h4v-.5ZM10.5 4h3v-.5h-3V4ZM7.63 6l.82 12.98c.04.57.51 1.02 1.09 1.02h4.92c.58 0 1.05-.45 1.09-1.02L16.37 6H7.63Z"/></svg>
+            </button>` : `<span class="small-muted">Read-only</span>`}
+        </div>
+      </td>
+    </tr>
+  `).join("");
+  }
+  function renderSelection() {
+    const selected = state.selectedIds.size;
+    els.bulkActions.hidden = selected === 0;
+    els.selectedCount.textContent = `${selected} ausgew\xE4hlt`;
+    els.deleteSelectedButton.hidden = !canEdit();
+    els.deleteSelectedButton.disabled = !canEdit() || selected === 0;
+    els.exportSelectedButton.disabled = selected === 0;
+    const allSelected = state.tickets.length > 0 && selected === state.tickets.length;
+    const partiallySelected = selected > 0 && selected < state.tickets.length;
+    els.selectAll.checked = allSelected;
+    els.selectAll.indeterminate = partiallySelected;
+  }
+  function applyPermissionState() {
+    const editable = canEdit();
+    [...els.ticketForm.elements].forEach((element) => {
+      if (element.id !== "editingId") element.disabled = !editable;
+    });
+    els.submitButton.textContent = editable ? els.editingId.value ? "\xC4nderungen speichern" : "Ticket speichern" : "Read-only aktiv";
+    els.cancelEditButton.disabled = !editable;
+  }
+  function getFormTicket() {
+    return {
+      id: els.editingId.value || void 0,
+      ticketNumber: els.ticketNumber.value,
+      firstName: els.firstName.value,
+      lastName: els.lastName.value,
+      phone: els.phone.value,
+      ticketType: els.ticketType.value,
+      price: els.price.value,
+      menu: els.menu.value
+    };
+  }
+  function fillForm(ticket) {
+    els.editingId.value = ticket.id;
+    els.ticketNumber.value = ticket.ticketNumber || "";
+    els.firstName.value = ticket.firstName || "";
+    els.lastName.value = ticket.lastName || "";
+    els.phone.value = ticket.phone || "";
+    els.ticketType.value = ticket.ticketType || "Standard";
+    els.price.value = ticket.price || "";
+    els.menu.value = ticket.menu || "";
+    els.cancelEditButton.hidden = false;
+    els.submitButton.textContent = "\xC4nderungen speichern";
+    els.ticketNumber.focus();
+  }
+  function resetForm() {
+    els.ticketForm.reset();
+    els.editingId.value = "";
+    els.ticketType.value = "Standard";
+    els.menu.value = "";
+    els.cancelEditButton.hidden = true;
+    els.submitButton.textContent = canEdit() ? "Ticket speichern" : "Read-only aktiv";
+  }
+
+  // assets/js/config.js
+  var PROJECT_BASE_URL = "https://wickerm4n.github.io/ticket-test/";
+  var rawConfig = window.TICKET_MANAGER_CONFIG || {};
+  function cleanUrl(value, fallback = "") {
+    const text = String(value || fallback || "").trim();
+    if (!text) return "";
+    return text.replace(/\/+$/, "");
+  }
+  function withTrailingSlash(value) {
+    const text = String(value || PROJECT_BASE_URL).trim();
+    return text.endsWith("/") ? text : `${text}/`;
+  }
+  var isLocalBackendHost = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  var CONFIG = {
+    BASE_URL: withTrailingSlash(rawConfig.BASE_URL || PROJECT_BASE_URL),
+    API_BASE_URL: cleanUrl(rawConfig.API_BASE_URL || (isLocalBackendHost ? window.location.origin : "")),
+    SOCKET_BASE_URL: cleanUrl(rawConfig.SOCKET_BASE_URL || rawConfig.API_BASE_URL || (isLocalBackendHost ? window.location.origin : ""))
+  };
+  function hasLiveBackend() {
+    return Boolean(CONFIG.API_BASE_URL);
+  }
+  function buildShareUrl(params2 = {}) {
+    const url = new URL(CONFIG.BASE_URL);
+    for (const [key, value] of Object.entries(params2)) {
+      if (value !== void 0 && value !== null && value !== "") {
+        url.searchParams.set(key, String(value));
+      }
+    }
+    return url.toString();
+  }
+  function backendRequiredError() {
+    const error = new Error("F\xFCr editierbare Live-Share-Links ist auf GitHub Pages ein separates Sync-Backend n\xF6tig. Read-only-Snapshot-Links funktionieren ohne Backend.");
+    error.code = "BACKEND_NOT_CONFIGURED";
+    return error;
+  }
+
+  // assets/js/storage.js
+  var LOCAL_KEY = "ticketManager.localTickets.v2";
+  var META_KEY = "ticketManager.localMeta.v2";
+  function loadLocalTickets() {
+    try {
+      const raw = localStorage.getItem(LOCAL_KEY);
+      const parsed = JSON.parse(raw || "[]");
+      return Array.isArray(parsed) ? parsed.map(normalizeTicket) : [];
+    } catch {
+      return [];
+    }
+  }
+  function saveLocalTickets(tickets) {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(tickets));
+  }
+  function loadLocalMeta() {
+    try {
+      const meta = JSON.parse(localStorage.getItem(META_KEY) || "{}");
+      return {
+        version: Number(meta.version || 1),
+        updatedAt: meta.updatedAt || (/* @__PURE__ */ new Date()).toISOString()
+      };
+    } catch {
+      return { version: 1, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    }
+  }
+  function saveLocalMeta(meta) {
+    localStorage.setItem(META_KEY, JSON.stringify(meta));
+  }
+
+  // assets/js/toast.js
+  var DEFAULT_DURATION = 4200;
+  function showToast(message, options = {}) {
+    const root = document.getElementById("toastRoot");
+    if (!root) return;
+    const toast = document.createElement("div");
+    toast.className = `toast ${options.type || "info"}`;
+    toast.innerHTML = `
+    <div>
+      <strong>${escapeToast(options.title || defaultTitle(options.type))}</strong>
+      <span>${escapeToast(message)}</span>
+    </div>
+  `;
+    root.append(toast);
+    const duration = Number(options.duration || DEFAULT_DURATION);
+    const hide = () => {
+      toast.classList.add("hide");
+      toast.addEventListener("animationend", () => toast.remove(), { once: true });
+    };
+    window.setTimeout(hide, duration);
+  }
+  function defaultTitle(type) {
+    if (type === "success") return "Erledigt";
+    if (type === "error") return "Fehler";
+    return "Hinweis";
+  }
+  function escapeToast(value) {
+    return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  // assets/js/dialogs.js
+  var CONFIRM_STORAGE_KEY = "ticketManager.confirmationPreferences.v2";
+  function getPrefs() {
+    try {
+      return JSON.parse(localStorage.getItem(CONFIRM_STORAGE_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+  function setPrefs(prefs) {
+    localStorage.setItem(CONFIRM_STORAGE_KEY, JSON.stringify(prefs));
+  }
+  function resetConfirmations() {
+    localStorage.removeItem(CONFIRM_STORAGE_KEY);
+  }
+  function confirmAction({ key, title, message, confirmText = "Best\xE4tigen", cancelText = "Abbrechen", danger = false }) {
+    const prefs = getPrefs();
+    if (key && prefs[key] === false) return Promise.resolve(true);
+    const root = document.getElementById("modalRoot");
+    root.hidden = false;
+    return new Promise((resolve) => {
+      root.innerHTML = `
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <h3 id="confirmTitle">${escapeHtml2(title)}</h3>
+        <p>${escapeHtml2(message)}</p>
+        <label class="confirm-check">
+          <input id="dontShowAgain" type="checkbox">
+          <span>
+            <strong>Nicht erneut anzeigen</strong>
+            <span>Diesen Best\xE4tigungsdialog k\xFCnftig \xFCberspringen.</span>
+          </span>
+        </label>
+        <div class="dialog-actions">
+          <button id="cancelConfirm" class="secondary-button" type="button">${escapeHtml2(cancelText)}</button>
+          <button id="acceptConfirm" class="primary-button" type="button" ${danger ? 'style="background:linear-gradient(145deg,var(--danger),var(--danger-strong));"' : ""}>${escapeHtml2(confirmText)}</button>
+        </div>
+      </div>
+    `;
+      const cleanup = (value) => {
+        const dontShow = root.querySelector("#dontShowAgain")?.checked;
+        if (value && key && dontShow) {
+          const nextPrefs = getPrefs();
+          nextPrefs[key] = false;
+          setPrefs(nextPrefs);
+        }
+        root.innerHTML = "";
+        root.hidden = true;
+        resolve(value);
+      };
+      root.querySelector("#cancelConfirm").addEventListener("click", () => cleanup(false));
+      root.querySelector("#acceptConfirm").addEventListener("click", () => cleanup(true));
+      root.addEventListener("click", (event) => {
+        if (event.target === root) cleanup(false);
+      }, { once: true });
+    });
+  }
+  function showShareDialog({ onCreate, backendAvailable = true }) {
+    const root = document.getElementById("modalRoot");
+    root.hidden = false;
+    return new Promise((resolve) => {
+      const helperText = backendAvailable ? "W\xE4hle aus, welche Berechtigung der neue Share-Link erhalten soll. Read-only-Links k\xF6nnen serverseitig keine Tickets ver\xE4ndern." : "GitHub-Pages-Modus: Ohne separates Sync-Backend wird ein statischer Read-only-Snapshot-Link erstellt. Editierbare Live-Links ben\xF6tigen API_BASE_URL in runtime-config.js.";
+      const editDisabled = backendAvailable ? "" : "disabled";
+      const editHint = backendAvailable ? "Andere Benutzer k\xF6nnen Tickets wie gewohnt erstellen, bearbeiten und l\xF6schen." : "Auf GitHub Pages ohne Backend nicht verf\xFCgbar.";
+      root.innerHTML = `
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+        <h3 id="shareTitle">Ticketliste teilen</h3>
+        <p>${escapeHtml2(helperText)}</p>
+        <div class="share-options">
+          <label class="share-option">
+            <input type="radio" name="shareAccess" value="read" checked>
+            <span>
+              <strong>Read-only</strong>
+              <span>Andere Benutzer k\xF6nnen die Ticketliste ansehen, aber keine Tickets erstellen, bearbeiten oder l\xF6schen.</span>
+            </span>
+          </label>
+          <label class="share-option ${backendAvailable ? "" : "is-disabled"}">
+            <input type="radio" name="shareAccess" value="edit" ${editDisabled}>
+            <span>
+              <strong>Editierbar</strong>
+              <span>${escapeHtml2(editHint)}</span>
+            </span>
+          </label>
+        </div>
+        <div id="shareResult" class="share-link-box" hidden>
+          <label>
+            <span class="small-muted">Share-Link</span>
+            <input id="shareLinkInput" type="text" readonly>
+          </label>
+          <button id="copyShareLink" class="secondary-button" type="button">Link erneut kopieren</button>
+        </div>
+        <div class="dialog-actions">
+          <button id="closeShare" class="secondary-button" type="button">Schlie\xDFen</button>
+          <button id="createShare" class="primary-button" type="button">Share-Link erstellen</button>
+        </div>
+      </div>
+    `;
+      const close = (value = null) => {
+        root.innerHTML = "";
+        root.hidden = true;
+        resolve(value);
+      };
+      const createButton = root.querySelector("#createShare");
+      const closeButton = root.querySelector("#closeShare");
+      const resultBox = root.querySelector("#shareResult");
+      const linkInput = root.querySelector("#shareLinkInput");
+      const copyButton = root.querySelector("#copyShareLink");
+      closeButton.addEventListener("click", () => close());
+      root.addEventListener("click", (event) => {
+        if (event.target === root) close();
+      }, { once: true });
+      createButton.addEventListener("click", async () => {
+        const access = root.querySelector("input[name='shareAccess']:checked")?.value || "read";
+        createButton.disabled = true;
+        createButton.textContent = "Wird erstellt \u2026";
+        try {
+          const result = await onCreate(access);
+          linkInput.value = result.url;
+          resultBox.hidden = false;
+          await copyToClipboard(result.url);
+          showToast("Share-Link wurde kopiert.", { type: "success" });
+          createButton.textContent = "Share-Link erneuern";
+        } catch (error) {
+          showToast(error.message || "Share-Link konnte nicht erstellt werden.", { type: "error" });
+          createButton.textContent = "Share-Link erstellen";
+        } finally {
+          createButton.disabled = false;
+        }
+      });
+      copyButton.addEventListener("click", async () => {
+        try {
+          await copyToClipboard(linkInput.value);
+          showToast("Share-Link wurde kopiert.", { type: "success" });
+        } catch {
+          showToast("Der Link konnte nicht automatisch kopiert werden.", { type: "error" });
+        }
+      });
+    });
+  }
+  function escapeHtml2(value) {
+    return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  // assets/js/api.js
+  async function request(path, options = {}) {
+    if (!CONFIG.API_BASE_URL) {
+      throw backendRequiredError();
+    }
+    const response = await fetch(`${CONFIG.API_BASE_URL}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers || {}
+      },
+      ...options,
+      body: options.body ? JSON.stringify(options.body) : void 0
+    });
+    let data = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
+    if (!response.ok || data?.ok === false) {
+      const error = new Error(data?.error || `HTTP ${response.status}`);
+      error.status = response.status;
+      throw error;
+    }
+    return data;
+  }
+  function createShare({ tickets, access, listId, token }) {
+    return request("/api/share", {
+      method: "POST",
+      body: { tickets, access, listId, token }
+    });
+  }
+  function readSharedList(listId, token) {
+    return request(`/api/lists/${encodeURIComponent(listId)}?token=${encodeURIComponent(token)}`);
+  }
+  function createSharedTicket(listId, token, ticket, sourceClientId) {
+    return request(`/api/lists/${encodeURIComponent(listId)}/tickets?token=${encodeURIComponent(token)}`, {
+      method: "POST",
+      body: { ticket, sourceClientId }
+    });
+  }
+  function updateSharedTicket(listId, token, ticketId, ticket, sourceClientId) {
+    return request(`/api/lists/${encodeURIComponent(listId)}/tickets/${encodeURIComponent(ticketId)}?token=${encodeURIComponent(token)}`, {
+      method: "PATCH",
+      body: { ticket, sourceClientId }
+    });
+  }
+  function deleteSharedTicket(listId, token, ticketId, sourceClientId) {
+    return request(`/api/lists/${encodeURIComponent(listId)}/tickets/${encodeURIComponent(ticketId)}?token=${encodeURIComponent(token)}`, {
+      method: "DELETE",
+      body: { sourceClientId }
+    });
+  }
+  function bulkDeleteSharedTickets(listId, token, ids, sourceClientId) {
+    return request(`/api/lists/${encodeURIComponent(listId)}/bulk-delete?token=${encodeURIComponent(token)}`, {
+      method: "POST",
+      body: { ids, sourceClientId }
+    });
+  }
+
+  // assets/js/app.js
+  subscribe(render);
+  var params = new URLSearchParams(window.location.search);
+  var initialShareId = params.get("share") || "";
+  var initialToken = params.get("token") || "";
+  var initialSnapshot = params.get("snapshot") || new URLSearchParams(window.location.hash.replace(/^#/, "")).get("snapshot") || "";
+  init();
+  async function init() {
+    bindEvents();
+    if (initialShareId && initialToken) {
+      await initSharedMode(initialShareId, initialToken);
+    } else if (initialSnapshot) {
+      initSnapshotMode(initialSnapshot);
+    } else {
+      initLocalMode();
+    }
+  }
+  function bindEvents() {
+    els.ticketForm.addEventListener("submit", onSubmitTicket);
+    els.cancelEditButton.addEventListener("click", resetForm);
+    els.selectAll.addEventListener("change", (event) => setAllSelection(event.target.checked));
+    els.ticketTableBody.addEventListener("click", onTableClick);
+    els.ticketTableBody.addEventListener("change", onTableChange);
+    els.exportAllButton.addEventListener("click", () => exportTickets(state.tickets, "tickets.csv"));
+    els.exportSelectedButton.addEventListener("click", exportSelectedTickets);
+    els.deleteSelectedButton.addEventListener("click", deleteSelectedTickets);
+    els.shareButton.addEventListener("click", openShareDialog);
+    els.resetConfirmationsButton.addEventListener("click", () => {
+      resetConfirmations();
+      showToast("Best\xE4tigungsdialoge werden wieder angezeigt.", { type: "success" });
+    });
+  }
+  function initLocalMode() {
+    const tickets = loadLocalTickets();
+    const meta = loadLocalMeta();
+    applyTickets(tickets, {
+      mode: "local",
+      access: "edit",
+      version: meta.version,
+      updatedAt: meta.updatedAt,
+      force: true
+    });
+  }
+  function initSnapshotMode(encodedSnapshot) {
+    try {
+      const snapshot = decodeSnapshot(encodedSnapshot);
+      applyTickets(snapshot.tickets, {
+        mode: "snapshot",
+        access: "read",
+        version: snapshot.version || 1,
+        updatedAt: snapshot.updatedAt || (/* @__PURE__ */ new Date()).toISOString(),
+        force: true
+      });
+      showToast("Geteilte Ticketliste als Read-only-Snapshot ge\xF6ffnet.", { type: "success" });
+    } catch {
+      applyTickets([], { mode: "snapshot", access: "read", force: true });
+      showToast("Dieser Snapshot-Link ist ung\xFCltig oder besch\xE4digt.", { type: "error", duration: 7e3 });
+    }
+  }
+  async function initSharedMode(listId, token) {
+    try {
+      const result = await readSharedList(listId, token);
+      applyTickets(result.list.tickets, {
+        mode: "shared",
+        access: result.list.access,
+        listId,
+        token,
+        version: result.list.version,
+        updatedAt: result.list.updatedAt,
+        force: true
+      });
+      setupSocket(listId, token);
+      setupSharedPolling(listId, token);
+      showToast(result.list.access === "edit" ? "Geteilte Ticketliste editierbar ge\xF6ffnet." : "Geteilte Ticketliste im Read-only-Modus ge\xF6ffnet.", { type: "success" });
+    } catch (error) {
+      applyTickets([], { mode: "shared", access: "read", listId, token, force: true });
+      showToast(error.message || "Share-Link konnte nicht ge\xF6ffnet werden.", { type: "error", duration: 7e3 });
+    }
+  }
+  async function setupSocket(listId, token) {
+    if (!hasLiveBackend()) {
+      return;
+    }
+    const socketReady = await loadSocketClient();
+    if (!socketReady || !window.io) {
+      showToast("Echtzeit-Synchronisierung ist nicht verf\xFCgbar. Es wird per Intervall aktualisiert.", { type: "error" });
+      return;
+    }
+    state.socket?.disconnect?.();
+    state.socket = window.io(CONFIG.SOCKET_BASE_URL || CONFIG.API_BASE_URL, {
+      auth: { listId, token },
+      reconnection: true,
+      reconnectionDelay: 700,
+      reconnectionDelayMax: 4e3,
+      transports: ["websocket", "polling"]
+    });
+    state.socket.on("connect", () => {
+      els.connectionStatus.textContent = state.access === "edit" ? "Geteilte Ticketliste \xB7 Editierbar \xB7 verbunden" : "Geteilte Ticketliste \xB7 Read-only \xB7 verbunden";
+    });
+    state.socket.on("disconnect", () => {
+      els.connectionStatus.textContent = state.access === "edit" ? "Geteilte Ticketliste \xB7 Editierbar \xB7 Verbindung getrennt" : "Geteilte Ticketliste \xB7 Read-only \xB7 Verbindung getrennt";
+    });
+    state.socket.on("connect_error", (error) => {
+      showToast(error.message || "Live-Verbindung konnte nicht hergestellt werden.", { type: "error", duration: 6e3 });
+    });
+    state.socket.on("tickets:changed", (payload) => {
+      if (!payload?.list?.tickets) return;
+      applyTickets(payload.list.tickets, {
+        mode: "shared",
+        access: payload.list.access || state.access,
+        listId,
+        token,
+        version: payload.list.version,
+        updatedAt: payload.list.updatedAt
+      });
+    });
+  }
+  function loadSocketClient() {
+    if (window.io) return Promise.resolve(true);
+    if (!CONFIG.SOCKET_BASE_URL && !CONFIG.API_BASE_URL) return Promise.resolve(false);
+    const socketScriptId = "socketIoClientScript";
+    const existing = document.getElementById(socketScriptId);
+    if (existing) {
+      return new Promise((resolve) => {
+        existing.addEventListener("load", () => resolve(Boolean(window.io)), { once: true });
+        existing.addEventListener("error", () => resolve(false), { once: true });
+      });
+    }
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.id = socketScriptId;
+      script.src = `${CONFIG.SOCKET_BASE_URL || CONFIG.API_BASE_URL}/socket.io/socket.io.js`;
+      script.async = true;
+      script.onload = () => resolve(Boolean(window.io));
+      script.onerror = () => resolve(false);
+      document.head.appendChild(script);
+    });
+  }
+  function setupSharedPolling(listId, token) {
+    if (!hasLiveBackend()) return;
+    window.setInterval(async () => {
+      if (!isSharedMode()) return;
+      try {
+        const result = await readSharedList(listId, token);
+        applyTickets(result.list.tickets, {
+          mode: "shared",
+          access: result.list.access || state.access,
+          listId,
+          token,
+          version: result.list.version,
+          updatedAt: result.list.updatedAt
+        });
+      } catch (error) {
+        showToast(error.message || "Synchronisierung fehlgeschlagen.", { type: "error", duration: 6e3 });
+      }
+    }, 3e4);
+  }
+  async function onSubmitTicket(event) {
+    event.preventDefault();
+    if (!canEdit()) {
+      showToast("Dieser Share-Link erlaubt nur lesenden Zugriff.", { type: "error" });
+      return;
+    }
+    const editingId = els.editingId.value;
+    const ticket = normalizeTicket({ ...getFormTicket(), id: editingId || void 0 });
+    const validationError = validateTicket(ticket, state.tickets, editingId);
+    if (validationError) {
+      showToast(validationError, { type: "error" });
+      return;
+    }
+    try {
+      if (isSharedMode()) {
+        const result = editingId ? await updateSharedTicket(state.listId, state.token, editingId, ticket, state.clientId) : await createSharedTicket(state.listId, state.token, ticket, state.clientId);
+        applyTickets(result.list.tickets, {
+          mode: "shared",
+          access: result.list.access || state.access,
+          version: result.list.version,
+          updatedAt: result.list.updatedAt,
+          listId: state.listId,
+          token: state.token
+        });
+      } else {
+        const now = (/* @__PURE__ */ new Date()).toISOString();
+        let nextTickets;
+        if (editingId) {
+          nextTickets = state.tickets.map((item) => item.id === editingId ? { ...item, ...ticket, id: item.id, createdAt: item.createdAt, updatedAt: now } : item);
+        } else {
+          nextTickets = [...state.tickets, { ...ticket, createdAt: now, updatedAt: now }];
+        }
+        saveAndApplyLocal(nextTickets);
+      }
+      resetForm();
+      showToast(editingId ? "Ticket aktualisiert." : "Ticket gespeichert.", { type: "success" });
+    } catch (error) {
+      showToast(error.message || "Ticket konnte nicht gespeichert werden.", { type: "error" });
+    }
+  }
+  function onTableChange(event) {
+    const checkbox = event.target.closest(".row-select");
+    if (!checkbox) return;
+    const row = checkbox.closest("tr");
+    if (!row?.dataset.id) return;
+    setSelection(row.dataset.id, checkbox.checked);
+  }
+  async function onTableClick(event) {
+    const row = event.target.closest("tr[data-id]");
+    if (!row) return;
+    const ticket = state.tickets.find((item) => item.id === row.dataset.id);
+    if (!ticket) return;
+    if (event.target.closest(".edit-ticket")) {
+      if (!canEdit()) return;
+      fillForm(ticket);
+      return;
+    }
+    if (event.target.closest(".delete-ticket")) {
+      await deleteTicket(ticket);
+    }
+  }
+  async function deleteTicket(ticket) {
+    if (!canEdit()) {
+      showToast("Dieser Share-Link erlaubt nur lesenden Zugriff.", { type: "error" });
+      return;
+    }
+    const confirmed = await confirmAction({
+      key: "delete-single-ticket",
+      title: "Ticket l\xF6schen?",
+      message: `Das Ticket ${ticket.ticketNumber} wird dauerhaft aus der Liste entfernt.`,
+      confirmText: "L\xF6schen",
+      danger: true
+    });
+    if (!confirmed) return;
+    try {
+      if (isSharedMode()) {
+        const result = await deleteSharedTicket(state.listId, state.token, ticket.id, state.clientId);
+        applyTickets(result.list.tickets, {
+          mode: "shared",
+          access: result.list.access || state.access,
+          version: result.list.version,
+          updatedAt: result.list.updatedAt,
+          listId: state.listId,
+          token: state.token
+        });
+      } else {
+        saveAndApplyLocal(state.tickets.filter((item) => item.id !== ticket.id));
+      }
+      if (els.editingId.value === ticket.id) resetForm();
+      showToast("Ticket gel\xF6scht.", { type: "success" });
+    } catch (error) {
+      showToast(error.message || "Ticket konnte nicht gel\xF6scht werden.", { type: "error" });
+    }
+  }
+  async function deleteSelectedTickets() {
+    if (!canEdit()) {
+      showToast("Dieser Share-Link erlaubt nur lesenden Zugriff.", { type: "error" });
+      return;
+    }
+    const ids = [...state.selectedIds];
+    if (!ids.length) return;
+    const confirmed = await confirmAction({
+      key: "delete-selected-tickets",
+      title: "Ausgew\xE4hlte Tickets l\xF6schen?",
+      message: `${ids.length} ausgew\xE4hlte Tickets werden dauerhaft entfernt.`,
+      confirmText: "Ausgew\xE4hlte l\xF6schen",
+      danger: true
+    });
+    if (!confirmed) return;
+    try {
+      if (isSharedMode()) {
+        const result = await bulkDeleteSharedTickets(state.listId, state.token, ids, state.clientId);
+        applyTickets(result.list.tickets, {
+          mode: "shared",
+          access: result.list.access || state.access,
+          version: result.list.version,
+          updatedAt: result.list.updatedAt,
+          listId: state.listId,
+          token: state.token
+        });
+      } else {
+        const idSet = new Set(ids);
+        saveAndApplyLocal(state.tickets.filter((item) => !idSet.has(item.id)));
+      }
+      clearSelection();
+      resetForm();
+      showToast("Ausgew\xE4hlte Tickets gel\xF6scht.", { type: "success" });
+    } catch (error) {
+      showToast(error.message || "Ausgew\xE4hlte Tickets konnten nicht gel\xF6scht werden.", { type: "error" });
+    }
+  }
+  function exportSelectedTickets() {
+    const ids = new Set(state.selectedIds);
+    const selectedTickets = state.tickets.filter((ticket) => ids.has(ticket.id));
+    exportTickets(selectedTickets, "tickets_auswahl.csv");
+  }
+  function exportTickets(tickets, filename) {
+    if (!tickets.length) {
+      showToast("Es sind keine Tickets zum Exportieren vorhanden.", { type: "error" });
+      return;
+    }
+    downloadCsv(filename, tickets);
+    showToast("CSV-Datei wurde erstellt.", { type: "success" });
+  }
+  async function openShareDialog() {
+    await showShareDialog({
+      backendAvailable: hasLiveBackend(),
+      onCreate: async (access) => {
+        if (state.access !== "edit" && access === "edit") {
+          throw new Error("Aus einem Read-only-Link kann kein editierbarer Share-Link erzeugt werden.");
+        }
+        let result;
+        try {
+          result = await createShare({
+            tickets: state.tickets,
+            access,
+            listId: isSharedMode() ? state.listId : "",
+            token: isSharedMode() ? state.token : ""
+          });
+        } catch (error) {
+          if (error.code !== "BACKEND_NOT_CONFIGURED") throw error;
+          result = createStaticSnapshotShare(access);
+        }
+        if (!isSharedMode() && result.ownerEditToken) {
+          const ownerUrl = new URL(result.ownerEditUrl || result.url);
+          history.replaceState({}, "", ownerUrl.pathname + ownerUrl.search);
+          applyTickets(result.list.tickets, {
+            mode: "shared",
+            access: "edit",
+            listId: result.list.id,
+            token: result.ownerEditToken,
+            version: result.list.version,
+            updatedAt: result.list.updatedAt,
+            force: true
+          });
+          setupSocket(result.list.id, result.ownerEditToken);
+          setupSharedPolling(result.list.id, result.ownerEditToken);
+        }
+        return result;
+      }
+    });
+  }
+  function createStaticSnapshotShare(access) {
+    if (access === "edit") {
+      throw new Error("Editierbare Share-Links ben\xF6tigen ein separat gehostetes Sync-Backend. Auf GitHub Pages kann ohne Backend nur ein Read-only-Snapshot-Link erstellt werden.");
+    }
+    const payload = {
+      type: "ticket-list-snapshot",
+      version: state.version || 1,
+      updatedAt: state.updatedAt || (/* @__PURE__ */ new Date()).toISOString(),
+      tickets: state.tickets
+    };
+    return {
+      ok: true,
+      access: "read",
+      staticSnapshot: true,
+      url: buildShareUrl({ snapshot: encodeSnapshot(payload) }),
+      list: {
+        id: "snapshot",
+        access: "read",
+        version: payload.version,
+        updatedAt: payload.updatedAt,
+        tickets: payload.tickets
+      }
+    };
+  }
+  function encodeSnapshot(payload) {
+    const json = JSON.stringify(payload);
+    const bytes = new TextEncoder().encode(json);
+    let binary = "";
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+  }
+  function decodeSnapshot(encoded) {
+    const normalized = String(encoded || "").replaceAll("-", "+").replaceAll("_", "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const binary = atob(padded);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    const parsed = JSON.parse(new TextDecoder().decode(bytes));
+    if (parsed?.type !== "ticket-list-snapshot" || !Array.isArray(parsed.tickets)) {
+      throw new Error("Invalid snapshot");
+    }
+    return parsed;
+  }
+  function saveAndApplyLocal(tickets) {
+    const version = Number(state.version || 1) + 1;
+    const updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+    saveLocalTickets(tickets);
+    saveLocalMeta({ version, updatedAt });
+    applyTickets(tickets, { mode: "local", access: "edit", version, updatedAt });
+  }
+})();
+
+  </script>
+</body>
+</html>
